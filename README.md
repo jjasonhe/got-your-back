@@ -1,5 +1,5 @@
 # got-your-back
-Got Your Back is an ergonomics-focused smart chair concept created by Dana Abusalah and Jiacheng Jason He for the Texas Instruments 2015 DIY with TI: Intern Edition Challenge. This repo is for the MSP432 LaunchPad hardware-side code, built in Energia 15.
+Got Your Back is an ergonomics-focused smart chair concept created by Dana Abusalah and Jiacheng Jason He for the Texas Instruments [2015 DIY with TI: Intern Edition Challenge](ti.com/design2015). This repo is for the MSP432 LaunchPad hardware-side code, built in Energia 15.
 
 ## What do I do
 You must have Energia 15 or 16, with the proper drivers installed. This code leverages the MultiTasking (MT) feature using TI-RTOS for the MSP432, so we don't think it will work if ported to a different LaunchPad.
