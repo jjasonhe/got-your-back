@@ -25,8 +25,8 @@ Ultratwo ultratwo(UPIN_BOT);
 uint32_t DIST_TOP = 0;
 uint32_t DIST_BOT = 0;
 
-uint32_t RATE_ERGO = 300000;      // Currently set at 5 min
-uint32_t RATE_STAND = 30;         // Currently set at 30 min
+uint32_t RATE_ERGO = 5000;      // Currently set at 5 sec
+uint32_t RATE_STAND = 30;         // Currently set at 30 sec
 uint32_t CNT_YES = 0;             // Counter for good times
 uint32_t CNT_NOP = 0;             // Counter for bad times
 uint32_t CNT_STAND = 0;           // Counter to cmp with RATE_STAND
