@@ -1,16 +1,16 @@
 void callback(char* topic, byte* payload, unsigned int length) {
-  Serial.print("Received message for topic ");
   Serial.print(topic);
-  Serial.print("with length ");
-  Serial.println(length);
-  Serial.println("Message:");
   Serial.write(payload, length);
   Serial.println();
   if (YPHI_VAR == 1) {
     RATE_ERGO = *payload;
+    Serial.print(RATE_ERGO);
+    Serial.print("\n");
   }
   if (YPHI_VAR == 2) {
     RATE_STAND = *payload;
+    Serial.print(RATE_STAND);
+    Serial.print("\n");
   }
 }
 
@@ -24,7 +24,7 @@ void setupYPhi()
 
 void loopYPhi()
 {
-  myEvent.waitFor();                               // NOT SURE WHERE TO PUT THIS (setup, loop, top) ********
+  myEvent.waitFor();
   
   // Start Ethernet with the build in MAC Address
   // attempt to connect to Wifi network:
@@ -40,7 +40,7 @@ void loopYPhi()
     delay(300);
   }
   
-  Serial.println("\nYou're connected to the network");
+  Serial.println("You're connected to the network");
   Serial.println("Waiting for an IP address");
   
   while (WiFi.localIP() == INADDR_NONE)
@@ -50,7 +50,7 @@ void loopYPhi()
     delay(300);
   }
 
-  Serial.println("\nIP Address obtained");
+  Serial.println("IP Address obtained");
   // We are connected and have an IP address.
   // Print the WiFi status.
   printWifiStatus();
@@ -62,27 +62,43 @@ void loopYPhi()
 
     if(!client.connect("jasonClient"))
     {
-      Serial.println("Connection failed");
+      Serial.println("ergoConnection failed");
     }
     else
     {
-      Serial.println("Connection success");
+      Serial.println("ergoConnection success");
+      if (alert[0] == 0x32)
+      {
+        CNT_STAND = 0;
+      }
       
       if (client.publish("ergoAlert", alert))
       {
         Serial.println("Publish success");
-          if (alert[0] = 2)                              // if it was the stand alert, these loops force person to stand for 30000 for-loop cycles
+        
+        if (alert[0] == 0x32)                              // if it was the stand alert, these loops force person to stand for 300 for-loop cycles
+        {
+          Serial.print("stand or it'll beep\n");
+          
+          for (int i = 0; i < 300; i++)
           {
-            for (int i = 0; i < 30000; i++)
+            DIST_TOP = ultrasonic.MeasureInCentimeters();
+            DIST_BOT = ultratwo.MeasureInCentimeters();
+            Serial.print("measured again\n");
+            if ((DIST_TOP < 7) || (DIST_BOT < 7))
             {
-              DIST_TOP = ultrasonic.MeasureInCentimeters();
-              DIST_BOT = ultratwo.MeasureInCentimeters();
-              if ((DIST_TOP < 7) || (DIST_BOT < 7)) {
-                // buzzer? ********
-              }
+              buzz(30);
+              Serial.print("sat back down ugh\n");
             }
           }
-        alert[0] = 0;
+        }
+        
+        Serial.print("reset alerts\n");
+        
+        alert[0] = 0x30;
+        
+        Serial.print(alert[0]);
+        Serial.print("\n");
       }
       else
       {
@@ -90,6 +106,44 @@ void loopYPhi()
       }
     }
   }
+  else
+  {
+    Serial.println("ergoConnection success");
+    if (alert[0] == 0x32)
+    {
+      CNT_STAND = 0;
+    }
+   
+    if (client.publish("ergoAlert", alert))
+    {
+      Serial.println("Publish success");
+      
+      if (alert[0] == 0x32)                              // if it was the stand alert, these loops force person to stand for 300 for-loop cycles
+      {
+        Serial.print("stand or it'll beep\n");
+        
+        for (int i = 0; i < 150; i++)
+        {
+          DIST_TOP = ultrasonic.MeasureInCentimeters();
+          DIST_BOT = ultratwo.MeasureInCentimeters();
+          Serial.print("measured again\n");
+          if ((DIST_TOP < 7) || (DIST_BOT < 7))
+          {
+            buzz(30);
+          }
+        }
+      }
+
+      Serial.print("reset alerts\n");
+      
+      alert[0] = 0x30;
+      
+      Serial.print(alert[0]);
+      Serial.print("\n");
+    }
+  }
+  
+  Serial.print("is this working\n");
   
   // Reconnect if the connection was lost
   if (!client.connected())
@@ -98,18 +152,29 @@ void loopYPhi()
 
     if(!client.connect("jasonClient"))
     {
-      Serial.println("Connection failed");
+      Serial.println("configConnection failed");
     }
     else
     {
-      Serial.println("Connection success");
+      Serial.println("Config connection success 1");
       if(client.subscribe("configPosture"))
       {
         YPHI_VAR = 1;      // so callback knows which topic it was from
-        Serial.println("Sub posture successfull");
+        Serial.println("Sub posture successful");
       }
     }
   }
+  else
+  {
+    Serial.println("Config connection success 1");
+    if(client.subscribe("configPosture"))
+    {
+      YPHI_VAR = 1;      // so callback knows which topic it was from
+      Serial.println("Sub posture successful");
+    }
+  }
+
+  Serial.print("checked posture updates\n");
 
   // Check if any message were received
   // on the topic we subsrcived to
@@ -122,24 +187,36 @@ void loopYPhi()
 
     if(!client.connect("jasonClient"))
     {
-      Serial.println("Connection failed");
+      Serial.println("configConnection failed");
     }
     else
     {
-      Serial.println("Connection success");
+      Serial.println("Config connection success 2");
       if(client.subscribe("configMovement"))
       {
         YPHI_VAR = 2;      // so callback knows which topic it was from
-        Serial.println("Sub movement successfull");
+        Serial.println("Sub movement successful");
       }
     }
   }
+  else
+  {
+    Serial.println("Config connection success 2");
+    if(client.subscribe("configMovement"))
+    {
+      YPHI_VAR = 2;      // so callback knows which topic it was from
+      Serial.println("Sub movement successful");
+    }
+  }
+
+  Serial.print("checked movement updates\n");
 
   // Check if any message were received
   // on the topic we subsrcived to
   client.loop();
   
   WiFi.disconnect();
+  Serial.print("wifi disconnected\n");
 
   myEvent.send();
 }
