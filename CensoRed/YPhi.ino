@@ -2,16 +2,6 @@ void callback(char* topic, byte* payload, unsigned int length) {
   Serial.print(topic);
   Serial.write(payload, length);
   Serial.println();
-  if (YPHI_VAR == 1) {
-    RATE_ERGO = *payload;
-    Serial.print(RATE_ERGO);
-    Serial.print("\n");
-  }
-  if (YPHI_VAR == 2) {
-    RATE_STAND = *payload;
-    Serial.print(RATE_STAND);
-    Serial.print("\n");
-  }
 }
 
 WiFiClient wifiClient;
@@ -80,7 +70,7 @@ void loopYPhi()
         {
           Serial.print("stand or it'll beep\n");
           
-          for (int i = 0; i < 300; i++)
+          for (int i = 0; i < 200; i++)
           {
             DIST_TOP = ultrasonic.MeasureInCentimeters();
             DIST_BOT = ultratwo.MeasureInCentimeters();
@@ -144,76 +134,6 @@ void loopYPhi()
   }
   
   Serial.print("is this working\n");
-  
-  // Reconnect if the connection was lost
-  if (!client.connected())
-  {
-    Serial.println("Disconnected. Reconnecting....");
-
-    if(!client.connect("jasonClient"))
-    {
-      Serial.println("configConnection failed");
-    }
-    else
-    {
-      Serial.println("Config connection success 1");
-      if(client.subscribe("configPosture"))
-      {
-        YPHI_VAR = 1;      // so callback knows which topic it was from
-        Serial.println("Sub posture successful");
-      }
-    }
-  }
-  else
-  {
-    Serial.println("Config connection success 1");
-    if(client.subscribe("configPosture"))
-    {
-      YPHI_VAR = 1;      // so callback knows which topic it was from
-      Serial.println("Sub posture successful");
-    }
-  }
-
-  Serial.print("checked posture updates\n");
-
-  // Check if any message were received
-  // on the topic we subsrcived to
-  client.loop();
-  
-  // Reconnect if the connection was lost
-  if (!client.connected())
-  {
-    Serial.println("Disconnected. Reconnecting....");
-
-    if(!client.connect("jasonClient"))
-    {
-      Serial.println("configConnection failed");
-    }
-    else
-    {
-      Serial.println("Config connection success 2");
-      if(client.subscribe("configMovement"))
-      {
-        YPHI_VAR = 2;      // so callback knows which topic it was from
-        Serial.println("Sub movement successful");
-      }
-    }
-  }
-  else
-  {
-    Serial.println("Config connection success 2");
-    if(client.subscribe("configMovement"))
-    {
-      YPHI_VAR = 2;      // so callback knows which topic it was from
-      Serial.println("Sub movement successful");
-    }
-  }
-
-  Serial.print("checked movement updates\n");
-
-  // Check if any message were received
-  // on the topic we subsrcived to
-  client.loop();
   
   WiFi.disconnect();
   Serial.print("wifi disconnected\n");

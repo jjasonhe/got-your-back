@@ -14,8 +14,6 @@ char password[] = "HE4696339711";
 // MQTTServer to use
 char server[] = "iot.eclipse.org";
 
-uint8_t YPHI_VAR = 0;
-
 #define UPIN_TOP    40
 #define UPIN_BOT    36
 #define BUZZER_PIN  39
@@ -26,7 +24,7 @@ Ultratwo ultratwo(UPIN_BOT);
 uint32_t DIST_TOP = 0;
 uint32_t DIST_BOT = 0;
 
-uint32_t RATE_ERGO = 5000;      // Currently set at 5 sec
+uint32_t RATE_ERGO = 5000;        // Currently set at 5 sec
 uint32_t RATE_STAND = 30;         // Currently set at 30 sec
 uint32_t CNT_YES = 0;             // Counter for good times
 uint32_t CNT_NOP = 0;             // Counter for bad times
@@ -53,16 +51,13 @@ void loop()
   Serial.print("distance variables updated\n");
   Serial.print(DIST_TOP);
   Serial.print("\n");
-  delay(1000);
   
   DIST_BOT = ultratwo.MeasureInCentimeters();
-  
-  delay(1000);
   
   Serial.print(DIST_BOT);
   Serial.print("\n");
   
-  if ((DIST_TOP < 7) && (DIST_BOT < 7))
+  if ((DIST_TOP < 10) && (DIST_BOT < 10))
   {
     CNT_YES++;
     CNT_STAND = CNT_STAND + 5;
